@@ -1,10 +1,60 @@
-import requests as r
+import requests
+import json
+import subprocess as sp
+from flask import Flask, render_template
+
+from requests import api
 
 
-apikey = "cc4e9df7f3733285633974da76abdb0df41162527e2452f8f88bcf70bacd267a"
 
-response = r.get("https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=10&api_key=" + apikey)
-print(response.json())
+app = Flask(__name__)
+kFile = open("key.txt", "r")
+api_key = kFile.readline()
 
 
- 
+
+def getCryptoData(symbol):
+    url = 'https://min-api.cryptocompare.com/data/pricemultifull?fsyms=' + symbol + '&tsyms=USD&api_key=' + api_key
+    r = requests.get(url)
+    data = r.json()
+
+    info = data['RAW'][symbol]['USD']
+    return info
+    
+
+def getDiff(crypto1, crypto2):
+    temp = crypto1['PRICE'] - crypto2['PRICE']
+    return temp
+
+
+
+
+def printF(info):
+    print(str(info['FROMSYMBOL']) + " price: $" + str(info['PRICE']))
+
+
+def main():
+    printF(getCryptoData('BTC'))
+    printF(getCryptoData('ETH'))
+    print('$' + str(getDiff(getCryptoData('BTC'), getCryptoData('ETH'))))
+
+
+
+@app.route("/")
+@app.route("/home")
+def home():
+    printF(getCryptoData('BTC'))
+    printF(getCryptoData('ETH'))
+    print('$' + str(getDiff(getCryptoData('BTC'), getCryptoData('ETH'))))
+
+    return render_template('home.html', diff=getDiff(getCryptoData('BTC'), getCryptoData('ETH')))
+
+
+
+
+@app.route("/Calculator")
+def Calculator():
+    return "<h1>Calculator</h>"
+
+if __name__ == "__main__":
+    app.run(debug=True)
