@@ -47,7 +47,16 @@ def home():
     printF(getCryptoData('ETH'))
     print('$' + str(getDiff(getCryptoData('BTC'), getCryptoData('ETH'))))
 
-    return render_template('home.html', diff=getDiff(getCryptoData('BTC'), getCryptoData('ETH')))
+    return render_template('index.html', diff=getDiff(getCryptoData('BTC'), getCryptoData('ETH')))
+
+
+@app.route("/searchTag/<userInfo>", methods=['POST'])
+def searchTag(userInfo):
+    userInfo = json.loads(userInfo)
+    print('tag received')
+    print(f"user selected tag: {userInfo['tag']}")
+
+    return 'info received sucessfully'
 
 
 
